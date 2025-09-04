@@ -2,9 +2,220 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix Big Data Impact</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #221f1f 0%, #b20710 50%, #e50914 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .title {
+            color: white;
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin-bottom: 2rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .subtitle {
+            color: #f5f5f5;
+            font-size: 1.5rem;
+            margin-bottom: 4rem;
+            opacity: 0.9;
+            animation: fadeInUp 1s ease-out 0.3s both;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            animation: slideInUp 0.8s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:nth-child(1) {
+            animation-delay: 0.5s;
+            animation-fill-mode: both;
+        }
+
+        .stat-card:nth-child(2) {
+            animation-delay: 0.7s;
+            animation-fill-mode: both;
+        }
+
+        .stat-card:nth-child(3) {
+            animation-delay: 0.9s;
+            animation-fill-mode: both;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.05), transparent);
+            transform: rotate(45deg);
+            transition: all 0.6s;
+            opacity: 0;
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+            animation: shimmer 1s ease-in-out;
+        }
+
+        .stat-number {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #e50914;
+            text-shadow: 0 0 20px rgba(229, 9, 20, 0.5);
+            display: block;
+            margin-bottom: 1rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .stat-label {
+            font-size: 1.3rem;
+            color: white;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        .impact-statement {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 3rem;
+            border-left: 5px solid #e50914;
+            animation: fadeIn 1s ease-out 1.2s both;
+        }
+
+        .impact-statement p {
+            color: #f5f5f5;
+            font-size: 1.4rem;
+            font-style: italic;
+            line-height: 1.6;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2.5rem;
+            }
+            .subtitle {
+                font-size: 1.2rem;
+            }
+            .stat-number {
+                font-size: 3rem;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <h1 class="title">The Power of Netflix Recommendations</h1>
+        <p class="subtitle">How Big Data Transforms Entertainment</p>
 
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-number">80%</span>
+                <p class="stat-label">of content watched comes from recommendations</p>
+            </div>
+
+            <div class="stat-card">
+                <span class="stat-number">30%</span>
+                <p class="stat-label">increase in clicks from personalized thumbnails</p>
+            </div>
+
+            <div class="stat-card">
+                <span class="stat-number">94B</span>
+                <p class="stat-label">hours watched in H2 2024 alone</p>
+            </div>
+        </div>
+
+        <div class="impact-statement">
+            <p>"Without big data analytics, Netflix would be just another streaming service with a generic catalog. With it, they've created a personalized entertainment universe for each of their 270+ million users."</p>
+        </div>
+    </div>
 </body>
 </html>
