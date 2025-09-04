@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix Algorithm Examples</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(ellipse at center, #1a1a1a 0%, #0f0f0f 70%);
+            min-height: 100vh;
+            padding: 20px;
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .title {
+            font-size: 3rem;
+            background: linear-gradient(45deg, #e50914, #ff6b6b, #e50914);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: #ccc;
+            animation: fadeInDown 1s ease-out 0.3s both;
+        }
+
+        .algorithm-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .algorithm-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            animation: slideInUp 0.8s ease-out;
+        }
+
+        .algorithm-card:nth-child(1) {
+            animation-delay: 0.2s;
+            animation-fill-mode: both;
+        }
+
+        .algorithm-card:nth-child(2) {
+            animation-delay: 0.4s;
+            animation-fill-mode: both;
+        }
+
+        .algorithm-card:nth-child(3) {
+            animation-delay: 0.6s;
+            animation-fill-mode: both;
+        }
+
+        .algorithm-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: #e50914;
+            box-shadow: 0 25px 50px rgba(229, 9, 20, 0.2);
+        }
+
+        .algorithm-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(229, 9, 20, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .algorithm-card:hover::before {
+            left: 100%;
+        }
+
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #e50914, #b20710);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            color: #e50914;
+            margin-bottom: 1rem;
+            font-weight: bold;
+        }
+
+        .card-description {
+            font-size: 1rem;
+            color: #ccc;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .example-flow {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 1.5rem;
+            border-left: 4px solid #e50914;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .flow-step:last-child {
+            margin-bottom: 0;
+        }
+
+        .step-number {
+            background: #e50914;
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 1rem;
+            font-size: 0.8rem;
+        }
+
+        .step-text {
+            flex: 1;
+        }
+
+        .step-highlight {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+
+        .real-time-demo {
+            background: linear-gradient(135deg, rgba(229, 9, 20, 0.1) 0%, rgba(178, 7, 16, 0.1) 100%);
+            border: 2px solid rgba(229, 9, 20, 0.3);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            animation: fadeIn 1s ease-out 1s both;
+        }
+
+        .demo-title {
+            font-size: 2rem;
+            color: #e50914;
+            margin-bottom: 1rem;
+        }
+
+        .demo-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-item:hover {
+            transform: scale(1.05);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #e50914;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: #ccc;
+            margin-top: 0.5rem;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px) rotateX(10deg);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) rotateX(0deg);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2rem;
+            }
+            .algorithm-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">How Netflix AI Really Works</h1>
+            <p class="subtitle">Real Algorithm Examples in Action</p>
+        </div>
+
+        <div class="algorithm-grid">
+            <!-- Collaborative Filtering -->
+            <div class="algorithm-card">
+                <div class="card-icon">🤝</div>
+                <h3 class="card-title">Collaborative Filtering</h3>
+                <p class="card-description">
+                    "People like you also enjoyed..." - Finding users with similar tastes and cross-recommending content.
+                </p>
+                <div class="example-flow">
+                    <div class="flow-step">
+                        <div class="step-number">1</div>
+                        <div class="step-text">You watched <span class="step-highlight">"Stranger Things"</span></div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="step-number">2</div>
+                        <div class="step-text">User B also watched <span class="step-highlight">"Stranger Things"</span></div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="step-number">3</div>
+                        <div class="step-text">User B loved <span class="step-highlight">"Dark"</span></div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="step-number">4</div>
+                        <div class="step-text">Netflix recommends <span class="step-highlight">"Dark"</span> to you!</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content-Based Filtering -->
+            <div class="algorithm-card">
+                <div class="card-icon">🎯</div>
+                <h3 class="card-title">Content-Based Filtering</h3>
+                <p class="card-description">
+                    Analyzing the actual content features - genre, actors, directors, themes, and matching your preferences.
+                </p>
+                <div class="example-flow">
+                    <div class="flow-step">
+                        <div class="step-number">1</div>
+                        <div class="step-text">Your history: <span class="step-highlight">Sci-Fi + Thriller + Mystery</span></div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="step-number">2</div>
+                        <div class="step-text">Netflix analyzes: <span class="step-highlight">Genre patterns</span></div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="step-number">3</div>
+                        <div class="step-text">Finds new show: <span class="step-highlight">Sci-Fi + Thriller + Mystery</span></div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="step-number">4</div>
+                        <div class="step-text">Perfect match: <span class="step-highlight">"Black Mirror"</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deep Learning Personalization -->
+            <div class="algorithm-card">
+                <div class="card-icon">🧠</div>
+                <h3 class="card-title">Deep Learning Personalization</h3>
+                <p class="card-description">
+                    AI analyzes your behavior patterns - when you pause, rewind, skip, and even your viewing schedule.
+                </p>
+                <div class="example-flow">
+                    <div class="flow-step">
+                        <div class="step-number">1</div>
+                        <div class="step-text">You <span class="step-highlight">pause</span> during action scenes</div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="step-number">2</div>
+                        <div class="step-text">You <span class="step-highlight">rewind</span> dialogue-heavy scenes</div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="step-number">3</div>
+                        <div class="step-text">You watch <span class="step-highlight">documentaries at night</span></div>
+                    </div>
+                    <div class="flow-step">
