@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix: Generic vs Personalized</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: white;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .title {
+            font-size: 3rem;
+            color: #e50914;
+            margin-bottom: 1rem;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: #ccc;
+            animation: fadeInDown 1s ease-out 0.3s both;
+        }
+
+        .comparison-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .netflix-view {
+            background: rgba(20, 20, 20, 0.9);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            animation: slideInUp 0.8s ease-out;
+        }
+
+        .netflix-view.generic {
+            border-color: #666;
+            animation-delay: 0.2s;
+            animation-fill-mode: both;
+        }
+
+        .netflix-view.personalized {
+            border-color: #e50914;
+            animation-delay: 0.4s;
+            animation-fill-mode: both;
+        }
+
+        .netflix-view:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+        }
+
+        .view-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid;
+        }
+
+        .generic .view-header {
+            border-bottom-color: #666;
+        }
+
+        .personalized .view-header {
+            border-bottom-color: #e50914;
+        }
+
+        .view-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .generic .view-title {
+            color: #999;
+        }
+
+        .personalized .view-title {
+            color: #e50914;
+        }
+
+        .view-description {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        .content-row {
+            margin-bottom: 2rem;
+        }
+
+        .row-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            padding-left: 0.5rem;
+        }
+
+        .generic .row-title {
+            color: #ccc;
+        }
+
+        .personalized .row-title {
+            color: #fff;
+        }
+
+        .content-items {
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            padding: 0.5rem;
+        }
+
+        .content-item {
+            min-width: 120px;
+            height: 70px;
+            background: linear-gradient(135deg, #333 0%, #555 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .personalized .content-item {
+            background: linear-gradient(135deg, #e50914 0%, #b20710 100%);
+        }
+
+        .content-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .personalized .content-item:hover {
+            box-shadow: 0 5px 15px rgba(229, 9, 20, 0.4);
+        }
+
+        .highlight-section {
+            background: rgba(229, 9, 20, 0.1);
+            border: 1px solid rgba(229, 9, 20, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            margin-top: 2rem;
+            animation: fadeIn 1s ease-out 1s both;
+        }
+
+        .highlight-title {
+            font-size: 2rem;
+            color: #e50914;
+            margin-bottom: 1rem;
+        }
+
+        .highlight-text {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: #f5f5f5;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .comparison-container {
+                grid-template-columns: 1fr;
+            }
+            .title {
+                font-size: 2rem;
+            }
+            .content-items {
+                flex-wrap: wrap;
+            }
+            .content-item {
+                min-width: 100px;
+                height: 60px;
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">Netflix Experience Comparison</h1>
+            <p class="subtitle">Same Platform, Completely Different Experience</p>
+        </div>
+
+        <div class="comparison-container">
+            <!-- Generic Netflix View -->
+            <div class="netflix-view generic">
+                <div class="view-header">
+                    <h2 class="view-title">Generic Netflix</h2>
+                    <p class="view-description">What everyone sees without personalization</p>
+                </div>
+
+                <div class="content-row">
+                    <h3 class="row-title">🔥 Trending Now</h3>
+                    <div class="content-items">
+                        <div class="content-item">Action Movie #1</div>
+                        <div class="content-item">Popular Series</div>
+                        <div class="content-item">New Release</div>
+                        <div class="content-item">Comedy Show</div>
+                    </div>
+                </div>
+
+                <div class="content-row">
+                    <h3 class="row-title">📊 Top 10 in Your Country</h3>
+                    <div class="content-items">
+                        <div class="content-item">Most Watched #1</div>
+                        <div class="content-item">Popular #2</div>
+                        <div class="content-item">Trending #3</div>
+                        <div class="content-item">Viral #4</div>
+                    </div>
+                </div>
+
+                <div class="content-row">
+                    <h3 class="row-title">🆕 New Releases</h3>
+                    <div class="content-items">
+                        <div class="content-item">Latest Movie</div>
+                        <div class="content-item">New Series</div>
+                        <div class="content-item">Fresh Content</div>
+                        <div class="content-item">Just Added</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Personalized Netflix View -->
+            <div class="netflix-view personalized">
+                <div class="view-header">
+                    <h2 class="view-title">Personalized Netflix</h2>
+                    <p class="view-description">Tailored specifically for individual viewing patterns</p>
+                </div>
+
+                <div class="content-row">
+                    <h3 class="row-title">🎯 Because You Watched Stranger Things</h3>
+                    <div class="content-items">
+                        <div class="content-item">Dark</div>
+                        <div class="content-item">Supernatural</div>
+                        <div class="content-item">Sci-Fi Thriller</div>
+                        <div class="content-item">Mystery Series</div>
+                    </div>
+                </div>
+
+                <div class="content-row">
+                    <h3 class="row-title">😂 Quirky TV Comedies</h3>
+                    <div class="content-items">
+                        <div class="content-item">Brooklyn Nine-Nine</div>
+                        <div class="content-item">The Office</div>
+                        <div class="content-item">Parks & Rec</div>
+                        <div class="content-item">Community</div>
+                    </div>
+                </div>
+
+                <div class="content-row">
+                    <h3 class="row-title">🏆 Award-Winning Korean TV Shows</h3>
+                    <div class="content-items">
+                        <div class="content-item">Kingdom</div>
+                        <div class="content-item">Crash Landing</div>
+                        <div class="content-item">Vincenzo</div>
+                        <div class="content-item">Hotel Del Luna</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="highlight-section">
+            <h2 class="highlight-title">The Big Data Difference</h2>
+            <p class="highlight-text">
+                The generic view shows what's popular overall. The personalized view analyzes your viewing history,
+                pause patterns, completion rates, ratings, and even the time you watch to create a unique experience.
+                <strong>This is big data in action!</strong>
+            </p>
+        </div>
+    </div>
+</body>
+</html>
