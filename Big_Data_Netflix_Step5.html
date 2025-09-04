@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix Prediction Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #141414 0%, #000000 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: white;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .title {
+            font-size: 3rem;
+            color: #e50914;
+            margin-bottom: 1rem;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #ccc;
+            animation: fadeInDown 1s ease-out 0.3s both;
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .user-profile {
+            background: rgba(229, 9, 20, 0.1);
+            border: 1px solid rgba(229, 9, 20, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .profile-title {
+            font-size: 1.8rem;
+            color: #e50914;
+            margin-bottom: 0.5rem;
+        }
+
+        .viewing-history {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .show-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .show-card:hover {
+            border-color: #e50914;
+            transform: scale(1.05);
+        }
+
+        .show-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #fff;
+        }
+
+        .show-genre {
+            font-size: 0.8rem;
+            color: #e50914;
+            margin-bottom: 0.3rem;
+        }
+
+        .show-rating {
+            font-size: 0.8rem;
+            color: #ccc;
+        }
+
+        .prediction-section {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .prediction-title {
+            font-size: 1.5rem;
+            color: #e50914;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .option-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-card:hover {
+            border-color: #e50914;
+            background: rgba(229, 9, 20, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .option-card.selected {
+            border-color: #e50914;
+            background: rgba(229, 9, 20, 0.2);
+            box-shadow: 0 0 20px rgba(229, 9, 20, 0.3);
+        }
+
+        .option-card.correct {
+            border-color: #4CAF50;
+            background: rgba(76, 175, 80, 0.2);
+            animation: correctPulse 0.6s ease-out;
+        }
+
+        .option-card.incorrect {
+            border-color: #f44336;
+            background: rgba(244, 67, 54, 0.2);
+            animation: incorrectShake 0.6s ease-out;
+        }
+
+        .option-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #fff;
+        }
+
+        .option-desc {
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+
+        .reveal-btn {
+            background: linear-gradient(135deg, #e50914, #b20710);
+            border: none;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 0 auto;
+            animation: pulse 2s infinite;
+        }
+
+        .reveal-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(229, 9, 20, 0.3);
+        }
+
+        .reveal-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            animation: none;
+        }
+
+        .explanation {
+            background: rgba(229, 9, 20, 0.1);
+            border-left: 4px solid #e50914;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            display: none;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .explanation.show {
+            display: block;
+        }
+
+        .explanation h3 {
+            color: #e50914;
+            margin-bottom: 1rem;
+        }
+
+        .explanation ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .explanation li {
+            margin-bottom: 0.5rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .explanation li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #e50914;
+            font-weight: bold;
+        }
+
+        .new-game-btn {
+            background: transparent;
+            border: 2px solid #e50914;
+            color: #e50914;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 1rem auto 0;
+        }
+
+        .new-game-btn:hover {
+            background: #e50914;
+            color: white;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes correctPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes incorrectShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2rem;
+            }
+            .viewing-history {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            }
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">Netflix Prediction Challenge</h1>
+            <p class="subtitle">Can you predict what Netflix's algorithm would recommend?</p>
+        </div>
+
+        <div class="game-container">
+            <div class="user-profile">
+                <div class="profile-header">
+                    <h2 class="profile-title">User Profile: Sarah</h2>
+                    <p>Based on her recent viewing history, what would Netflix recommend next?</p>
+                </div>
+
+                <div class="viewing-history">
+                    <div class="show-card">
+                        <div class="show-title">Stranger Things</div>
+                        <div class="show-genre">Sci-Fi, Mystery</div>
+                        <div class="show-rating">👍 Finished all seasons</div>
+                    </div>
+                    <div class="show-card">
+                        <div class="show-title">Dark</div>
+                        <div class="show-genre">Sci-Fi, Thriller</div>
+                        <div class="show-rating">👍 Binge-watched</div>
+                    </div>
+                    <div class="show-card">
+                        <div class="show-title">Black Mirror</div>
+                        <div class="show-genre">Sci-Fi, Anthology</div>
+                        <div class="show-rating">👍 Watched 8 episodes</div>
+                    </div>
+                    <div class="show-card">
+                        <div class="show-title">The OA</div>
+                        <div class="show-genre">Mystery, Supernatural</div>
+                        <div class="show-rating">👍 Paused frequently</div>
+                    </div>
+                    <div class="show-card">
+                        <div class="show-title">Westworld</div>
+                        <div class="show-genre">Sci-Fi, Drama</div>
+                        <div class="show-rating">👎 Stopped after 2 episodes</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="prediction-section">
+                <h3 class="prediction-title">What will Netflix recommend to Sarah?</h3>
+
+                <div class="options-grid">
+                    <div class="option-card" data-option="a">
+                        <div class="option-title">The Crown</div>
+                        <div class="option-desc">Historical Drama, Biography</div>
+                    </div>
+                    <div class="option-card" data-option="b">
+                        <div class="option-title">Russian Doll</div>
+                        <div class="option-desc">Mystery, Time Loop, Sci-Fi</div>
+                    </div>
+                    <div class="option-card" data-option="c">
+                        <div class="option-title">Friends</div>
+                        <div class="option-desc">Comedy, Sitcom</div>
+                    </div>
+                    <div class="option-card" data-option="d">
+                        <div class="option-title">Mindhunter</div>
+                        <div class="option-desc">Crime, Psychological Thriller</div>
+                    </div>
+                </div>
+
+                <button class="reveal-btn" onclick="revealAnswer()">Reveal Netflix's Choice</button>
+            </div>
+
+            <div class="explanation" id="explanation">
+                <h3>🎯 Netflix would recommend: Russian Doll</h3>
+                <p><strong>Why the algorithm chose this:</strong></p>
+                <ul>
+                    <li><strong>Genre Match:</strong> Sarah loves sci-fi mystery combinations (Stranger Things, Dark)</li>
+                    <li><strong>Complexity Pattern:</strong> She paused frequently during The OA, indicating she enjoys complex narratives</li>
+                    <li><strong>Binge Behavior:</strong> She binged Dark, and Russian Doll has similar addictive storytelling</li>
+                    <li><strong>Content-Based Filtering:</strong> Time loops and mystery elements match her viewing DNA</li>
+                    <li><strong>Collaborative Filtering:</strong> Users who loved Stranger Things + Dark also loved Russian Doll</li>
+                    <li><strong>Negative Signals:</strong> She stopped watching Westworld (too slow-paced), so Netflix avoids similar shows</li>
+                </ul>
+
+                <button class="new-game-btn" onclick="newGame()">Try Another Profile</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedOption = null;
+        const correctAnswer = 'b';
+
+        // Add click handlers to option cards
+        document.querySelectorAll('.option-card').forEach(card => {
+            card.addEventListener('click', function() {
+                // Remove previous selection
+                document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+
+                // Select this card
+                this.classList.add('selected');
+                selectedOption = this.dataset.option;
+
+                // Enable reveal button
+                document.querySelector('.reveal-btn').disabled = false;
+            });
+        });
+
+        function revealAnswer() {
+            if (!selectedOption) {
+                alert('Please select an option first!');
+                return;
+            }
+
+            // Disable further clicking
+            document.querySelectorAll('.option-card').forEach(card => {
+                card.style.pointerEvents = 'none';
+            });
+
+            // Show correct/incorrect
+            document.querySelectorAll('.option-card').forEach(card => {
+                if (card.dataset.option === correctAnswer) {
+                    card.classList.add('correct');
+                } else if (card.dataset.option === selectedOption && selectedOption !== correctAnswer) {
+                    card.classList.add('incorrect');
+                }
+            });
+
+            // Show explanation
+            setTimeout(() => {
+                document.getElementById('explanation').classList.add('show');
+            }, 1000);
+
+            // Disable reveal button
+            document.querySelector('.reveal-btn').disabled = true;
+        }
+
+        function newGame() {
+            // Reset game state
+            selectedOption = null;
+
+            // Reset cards
+            document.querySelectorAll('.option-card').forEach(card => {
+                card.classList.remove('selected', 'correct', 'incorrect');
+                card.style.pointerEvents = 'auto';
+            });
+
+            // Hide explanation
+            document.getElementById('explanation').classList.remove('show');
+
+            // Reset button
+            document.querySelector('.reveal-btn').disabled = false;
+
+            // Generate new profile (for demo purposes, we'll just change the name and shows)
+            const profiles = [
+                {
+                    name: "Mike",
+                    shows: [
+                        {title: "The Office", genre: "Comedy, Mockumentary", rating: "👍 Rewatched 3 times"},
+                        {title: "Parks & Recreation", genre: "Comedy, Sitcom", rating: "👍 Finished all seasons"},
+                        {title: "Brooklyn Nine-Nine", genre: "Comedy, Police", rating: "👍 Binge-watched"},
+                        {title: "Community", genre: "Comedy, Meta", rating: "👍 Loved the concepts"},
+                        {title: "The Good Place", genre: "Comedy, Philosophy", rating: "👎 Too philosophical"}
+                    ],
+                    options: [
+                        {title: "Stranger Things", desc: "Sci-Fi, Horror", correct: false},
+                        {title: "Schitt's Creek", desc: "Comedy, Family", correct: true},
+                        {title: "Breaking Bad", desc: "Crime, Drama", correct: false},
+                        {title: "The Crown", desc: "Historical Drama", correct: false}
+                    ],
+                    correctIndex: 1,
+                    explanation: "Schitt's Creek - Mike loves workplace comedies with heart and character development!"
+                },
+                {
+                    name: "Emma",
+                    shows: [
+                        {title: "Bridgerton", genre: "Romance, Period", rating: "👍 Watched twice"},
+                        {title: "Emily in Paris", genre: "Romance, Comedy", rating: "👍 Guilty pleasure"},
+                        {title: "The Crown", genre: "Drama, History", rating: "👍 Loves the costumes"},
+                        {title: "Downton Abbey", genre: "Period Drama", rating: "👍 Binge-watched"},
+                        {title: "Game of Thrones", genre: "Fantasy, Violence", rating: "👎 Too violent"}
+                    ],
+                    options: [
+                        {title: "Ozark", desc: "Crime, Thriller", correct: false},
+                        {title: "Anne with an E", desc: "Period, Coming-of-age", correct: true},
+                        {title: "Stranger Things", desc: "Sci-Fi, Horror", correct: false},
+                        {title: "Money Heist", desc: "Heist, Action", correct: false}
+                    ],
+                    correctIndex: 1,
+                    explanation: "Anne with an E - Emma loves period pieces with beautiful cinematography and romance!"
+                }
+            ];
+
+            // Randomly select a new profile
+            const newProfile = profiles[Math.floor(Math.random() * profiles.length)];
+
+            // Update the profile display
+            document.querySelector('.profile-title').textContent = `User Profile: ${newProfile.name}`;
+
+            // Update viewing history
+            const historyContainer = document.querySelector('.viewing-history');
+            historyContainer.innerHTML = '';
+
+            newProfile.shows.forEach(show => {
+                const showCard = document.createElement('div');
+                showCard.className = 'show-card';
+                showCard.innerHTML = `
+                    <div class="show-title">${show.title}</div>
+                    <div class="show-genre">${show.genre}</div>
+                    <div class="show-rating">${show.rating}</div>
+                `;
+                historyContainer.appendChild(showCard);
+            });
+
+            // Update options
+            const optionsContainer = document.querySelector('.options-grid');
+            optionsContainer.innerHTML = '';
+
+            newProfile.options.forEach((option, index) => {
+                const optionCard = document.createElement('div');
+                optionCard.className = 'option-card';
+                optionCard.dataset.option = String.fromCharCode(97 + index); // a, b, c, d
+                optionCard.innerHTML = `
+                    <div class="option-title">${option.title}</div>
+                    <div class="option-desc">${option.desc}</div>
+                `;
+                optionCard.addEventListener('click', function() {
+                    document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedOption = this.dataset.option;
+                    document.querySelector('.reveal-btn').disabled = false;
+                });
+                optionsContainer.appendChild(optionCard);
+            });
+
+            // Update correct answer
+            window.correctAnswer = String.fromCharCode(97 + newProfile.correctIndex);
+
+            // Update explanation
+            document.querySelector('.explanation h3').textContent = `🎯 Netflix would recommend: ${newProfile.options[newProfile.correctIndex].title}`;
+            document.querySelector('.explanation p + ul').previousElementSibling.innerHTML = `<strong>Why the algorithm chose this:</strong><br>${newProfile.explanation}`;
+        }
+    </script>
+</body>
+</html>
