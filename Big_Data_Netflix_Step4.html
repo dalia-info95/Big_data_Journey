@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix Data Tracking</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #141414 0%, #000000 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .title {
+            font-size: 3.5rem;
+            background: linear-gradient(45deg, #e50914, #ff4757, #e50914);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            animation: fadeInDown 1s ease-out, glow 2s ease-in-out infinite alternate;
+        }
+
+        .subtitle {
+            font-size: 1.4rem;
+            color: #ccc;
+            animation: fadeInDown 1s ease-out 0.3s both;
+        }
+
+        .data-visualization {
+            position: relative;
+            background: radial-gradient(ellipse at center, rgba(229, 9, 20, 0.1) 0%, transparent 70%);
+            border-radius: 30px;
+            padding: 3rem 2rem;
+            margin-bottom: 3rem;
+            overflow: hidden;
+        }
+
+        .data-visualization::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(229,9,20,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+            z-index: 0;
+        }
+
+        .tracking-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tracking-category {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            animation: slideInUp 0.8s ease-out;
+        }
+
+        .tracking-category:nth-child(1) { animation-delay: 0.1s; animation-fill-mode: both; }
+        .tracking-category:nth-child(2) { animation-delay: 0.2s; animation-fill-mode: both; }
+        .tracking-category:nth-child(3) { animation-delay: 0.3s; animation-fill-mode: both; }
+        .tracking-category:nth-child(4) { animation-delay: 0.4s; animation-fill-mode: both; }
+
+        .tracking-category:hover {
+            transform: translateY(-15px) scale(1.03);
+            border-color: #e50914;
+            box-shadow: 0 25px 50px rgba(229, 9, 20, 0.3);
+        }
+
+        .tracking-category::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, transparent, #e50914, transparent);
+            border-radius: 20px;
+            opacity: 0;
+            z-index: -1;
+            transition: opacity 0.3s ease;
+        }
+
+        .tracking-category:hover::after {
+            opacity: 1;
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .category-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #e50914, #b20710);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-right: 1rem;
+        }
+
+        .category-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #e50914;
+        }
+
+        .data-points {
+            list-style: none;
+        }
+
+        .data-point {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+            border-left: 3px solid #e50914;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .data-point:hover {
+            background: rgba(229, 9, 20, 0.1);
+            transform: translateX(10px);
+        }
+
+        .data-point-title {
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 0.3rem;
+        }
+
+        .data-point-desc {
+            font-size: 0.9rem;
+            color: #ccc;
+            line-height: 1.4;
+        }
+
+        .real-time-counter {
+            background: linear-gradient(135deg, rgba(229, 9, 20, 0.2) 0%, rgba(178, 7, 16, 0.1) 100%);
+            border: 2px solid rgba(229, 9, 20, 0.3);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            animation: fadeIn 1s ease-out 1.2s both;
+        }
+
+        .counter-title {
+            font-size: 2.5rem;
+            color: #e50914;
+            margin-bottom: 1rem;
+        }
+
+        .counter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .counter-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .counter-item:hover {
+            transform: scale(1.05) rotateY(5deg);
+        }
+
+        .counter-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #e50914;
+            margin-bottom: 0.5rem;
+            animation: countUp 2s ease-out 1.5s both;
+        }
+
+        .counter-label {
+            font-size: 1rem;
+            color: #f5f5f5;
+        }
+
+        .counter-desc {
+            font-size: 0.8rem;
+            color: #999;
+            margin-top: 0.5rem;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px) rotateX(10deg);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) rotateX(0deg);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 20px rgba(229, 9, 20, 0.5); }
+            to { text-shadow: 0 0 30px rgba(229, 9, 20, 0.8), 0 0 40px rgba(229, 9, 20, 0.3); }
+        }
+
+        @keyframes countUp {
+            from { transform: scale(0.5) rotateY(180deg); opacity: 0; }
+            to { transform: scale(1) rotateY(0deg); opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2.5rem;
+            }
+            .tracking-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">Netflix's Data Collection</h1>
+            <p class="subtitle">Every Click, Pause, and Scroll is Analyzed</p>
+        </div>
+
+        <div class="data-visualization">
+            <div class="tracking-grid">
+                <!-- Viewing Behavior -->
+                <div class="tracking-category">
+                    <div class="category-header">
+                        <div class="category-icon">👁️</div>
+                        <h3 class="category-title">Viewing Behavior</h3>
+                    </div>
+                    <ul class="data-points">
+                        <li class="data-point">
+                            <div class="data-point-title">Watch Time</div>
+                            <div class="data-point-desc">How long you watch each title, completion rates</div>
+                        </li>
+                        <li class="data-point">
+                            <div class="data-point-title">Pause Patterns</div>
+                            <div class="data-point-desc">When and where you pause, rewind, or fast-forward</div>
+                        </li>
+                        <li class="data-point">
+                            <div class="data-point-title">Skip Behavior</div>
+                            <div class="data-point-desc">Which intros/credits you skip, abandoned shows</div>
+                        </li>
+                        <li class="data-point">
+                            <div class="data-point-title">Binge Patterns</div>
+                            <div class="data-point-desc">How many episodes you watch in one session</div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Device & Context -->
+                <div class="tracking-category">
+                    <div class="category-header">
+                        <div class="category-icon">📱</div>
+                        <h3 class="category-title">Device & Context</h3>
+                    </div>
+                    <ul class="data-points">
+                        <li class="data-point">
+                            <div class="data-point-title">Device Type</div>
+                            <div class="data-point-desc">TV, laptop, mobile, tablet viewing preferences</div>
+                        </li>
+                        <li class="data-point">
+                            <div class="data-point-title">Time of Day</div>
+                            <div class="data-point-desc">When you watch different types of content</div>
+                        </li>
+                        <li class="data-point">
+                            <div class="data-point-title">Location Data</div>
+                            <div class="data-point-desc">Geographic viewing patterns and regional preferences</div>
+                        </li>
+                        <li class="data-point">
+                            <div class="data-point-title">Audio Settings</div>
+                            <div class="data-point-desc">Subtitle usage, audio language preferences</div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Interaction Data -->
+                <div class="tracking-category">
+                    <div class="category-header">
+                        <div class="category-icon">🔍</div>
+                        <h3 class="category-title">Interaction Data</h3>
+                    </div>
+                    <ul class="data-points">
+                        <li class="data-point">
+                            <div class="data-point-title">Search Queries</div>
+                            <div class="data-point-desc">What you search for and what you actually watch</div>
+                        </li>
+                        <li class="data-point">
+                            <div class="data-point-title">Browsing Behavior</div>
+                            <div class="data-point-desc">How long you scroll, what thumbnails you hover over</div>
+                        </li>
+                        <li class="data-point">
+                            <div class="data-point-title">Rating Patterns</div>
+                            <div class="data-point-desc">Thumbs up/down, what you add to "My List"</div>
+                        </li>
+                        <li class="data-point">
+                            <div class="data-point-title">Menu Navigation</div>
+                            <div class="data-point-desc">Which categories you explore most often</div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Content Analysis -->
+                <div class="tracking-category">
+                    <div class="category-header">
+                        <div class="category-icon">🎬</div>
+                        <h3 class="category-title">Content Analysis</h3>
+                    </div>
+                    <ul class="data-points">
+                        <li class="data-point">
+                            <div class="data-point-title">Genre Preferences</div>
+                            <div class="data-point-desc">Which genres you watch and when</div>
+                        </li>
+                        <li class="data-point">
+                            <div class="data-point-title">Actor/Director Patterns</div>
+                            <div class="data-point-desc">Following specific talent across different shows</div>
+                        </li>
+                        <li class="data-point">
+                            <div class="data-point-title">Content Metadata</div>
+                            <div class="data-point-desc">Release year, runtime, content rating preferences</div>
+                        </li>
+                        <li class="data-point">
+                            <div class="data-point-title">Similar Content</div>
+                            <div class="data-point-desc">How you respond to similar themes and storylines</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="real-time-counter">
+            <h2 class="counter-title">Data Processing in Real-Time</h2>
+            <p style="font-size: 1.2rem; color: #f5f5f5; margin-bottom: 2rem;">
+                Netflix processes this data continuously, 24/7, for every user
+            </p>
+
+            <div class="counter-grid">
+                <div class="counter-item">
+                    <div class="counter-number">1000+</div>
+                    <div class="counter-label">Data Points</div>
+                    <div class="counter-desc">Per user profile</div>
+                </div>
+                <div class="counter-item">
+                    <div class="counter-number">24/7</div>
+                    <div class="counter-label">Processing</div>
+                    <div class="counter-desc">Continuous learning</div>
+                </div>
+                <div class="counter-item">
+                    <div class="counter-number">270M</div>
+                    <div class="counter-label">User Profiles</div>
+                    <div class="counter-desc">Globally analyzed</div>
+                </div>
+                <div class="counter-item">
+                    <div class="counter-number">&lt;1sec</div>
+                    <div class="counter-label">Response Time</div>
+                    <div class="counter-desc">For recommendations</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
